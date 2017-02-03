@@ -1,6 +1,7 @@
 package com.sparshik.monalisa;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int REQUEST_NEW_IMAGE_FILE = 1;
     private int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
+    private Uri file;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +60,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         InputStream stream = getResources().openRawResource(R.raw.friends_2);
-        Bitmap bitmap = BitmapFactory.decodeStream(stream);
-        overlayFace(bitmap,null);
+        file = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getBaseContext().getPackageName() + "/raw/friends_2.png");
+        bitmap = BitmapFactory.decodeStream(stream);
+        overlayFace(bitmap, null);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void overlayFace(Bitmap bitmap, Bitmap secondBitmap){
+    public void overlayFace(Bitmap bitmap, Bitmap secondBitmap) {
 
         // A new face detector is created for detecting the face and its landmarks.
         //
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, getString(R.string.low_storage_error));
             }
         }
-        if(faces.size()>0) {
+        if (faces.size() > 0) {
             FaceView overlay = (FaceView) findViewById(R.id.faceView);
             if (secondBitmap == null) {
                 overlay.setContent(bitmap, null, faces);
@@ -155,13 +159,13 @@ public class MainActivity extends AppCompatActivity {
             String imagePath = cursor.getString(columnIndex);
             Log.d(getClass().getSimpleName(), " Image File PATH IN PHONE: " + imagePath);
             cursor.close();
-            Uri file = Uri.fromFile(new File(imagePath));
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            file = Uri.fromFile(new File(imagePath));
+            bitmap = BitmapFactory.decodeFile(imagePath);
 
             InputStream stream = getResources().openRawResource(R.raw.e1);
             Bitmap secondBitmap = BitmapFactory.decodeStream(stream);
 
-            overlayFace(bitmap,secondBitmap);
+            overlayFace(bitmap, secondBitmap);
 
         }
     }
@@ -184,8 +188,22 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
+        if (id == R.id.action_share) {
+//            startActivity(createShareMonalisaIntent(file,null));
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+
+//    private Intent createShareMonalisaIntent() {
+
+//        Intent intent = new Intent(Intent.ACTION_SEND);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+//        intent.putExtra(Intent.EXTRA_STREAM, uri);
+//        intent.putExtra(Intent.EXTRA_TEXT,  + " " + Constants.SHARE_HASHTAG);
+//        intent.setType("image/*");
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        return intent;
+//    }
 
 }

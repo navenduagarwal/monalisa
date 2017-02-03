@@ -4,5 +4,6 @@
     <string name="action_settings">Settings</string>
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
     <string name="no_faces_error">Unable to find any faces, sorry !</string>
+    <string name="action_share">Share</string>
 
 </resources>
