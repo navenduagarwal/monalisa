@@ -7,11 +7,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
+
 /**
  * View which displays a bitmap containing a face along with overlay graphics that identify the
  * locations of detected facial landmarks.
@@ -19,6 +21,7 @@ import com.google.android.gms.vision.face.Landmark;
 
 public class FaceView extends View {
     private Bitmap mBitmap;
+    private Bitmap mSecondBitmap;
     private SparseArray<Face> mFaces;
 
     public FaceView(Context context, AttributeSet attrs) {
@@ -28,8 +31,9 @@ public class FaceView extends View {
     /**
      * Sets the bitmap background and the associated face detections.
      */
-    void setContent(Bitmap bitmap, SparseArray<Face> faces) {
+    void setContent(Bitmap bitmap, Bitmap secondBitmap, SparseArray<Face> faces) {
         mBitmap = bitmap;
+        mSecondBitmap = secondBitmap;
         mFaces = faces;
         invalidate();
     }
@@ -42,7 +46,11 @@ public class FaceView extends View {
         super.onDraw(canvas);
         if ((mBitmap != null) && (mFaces != null)) {
             double scale = drawBitmap(canvas);
-            drawFaceAnnotations(canvas, scale);
+//            if (mSecondBitmap == null) {
+                drawFaceAnnotations(canvas, scale);
+//            } else {
+                drawSecondBitmap(canvas, scale);
+//            }
         }
     }
 
@@ -57,7 +65,7 @@ public class FaceView extends View {
         double imageHeight = mBitmap.getHeight();
         double scale = Math.min(viewWidth / imageWidth, viewHeight / imageHeight);
 
-        Rect destBounds = new Rect(0, 0, (int)(imageWidth * scale), (int)(imageHeight * scale));
+        Rect destBounds = new Rect(0, 0, (int) (imageWidth * scale), (int) (imageHeight * scale));
         canvas.drawBitmap(mBitmap, null, destBounds, null);
         return scale;
     }
@@ -65,7 +73,7 @@ public class FaceView extends View {
     /**
      * Draws a small circle for each detected landmark, centered at the detected landmark position.
      * <p>
-     *
+     * <p>
      * Note that eye landmarks are defined to be the midpoint between the detected eye corner
      * positions, which tends to place the eye landmarks at the lower eyelid rather than at the
      * pupil position.
@@ -78,10 +86,25 @@ public class FaceView extends View {
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
+            Log.d("Height", face.getHeight()+"");
+
             for (Landmark landmark : face.getLandmarks()) {
                 int cx = (int) (landmark.getPosition().x * scale);
                 int cy = (int) (landmark.getPosition().y * scale);
                 canvas.drawCircle(cx, cy, 10, paint);
+                Log.d("Points", cx + "," + cy);
+            }
+        }
+    }
+
+    private void drawSecondBitmap(Canvas canvas, double scale) {
+        if (mFaces.size() > 0 && mSecondBitmap !=null) {
+            Face face = mFaces.valueAt(0);
+            if (face.getLandmarks().size() > 5) {
+                Landmark left_eye = face.getLandmarks().get(6);
+                int cx = (int) (left_eye.getPosition().x * scale);
+                int cy = (int) (left_eye.getPosition().y * scale);
+                canvas.drawBitmap(mSecondBitmap, cx, cy, null);
             }
         }
     }
