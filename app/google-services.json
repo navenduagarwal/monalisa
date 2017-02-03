@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "14825640113",
+    "firebase_url": "https://monalisa-e921b.firebaseio.com",
+    "project_id": "monalisa-e921b",
+    "storage_bucket": "monalisa-e921b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14825640113:android:9dd7213c525212a5",
+        "android_client_info": {
+          "package_name": "com.sparshik.monalisa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "14825640113-a78l248tagk2f5q9lm0l97mp53tga9io.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFpF_1F5jtXsrg0WotORRw4FYh3u9m-fA"
+        },
+        {
+          "current_key": "AIzaSyAVBf7Ux85WGTLbZLSM5r_XfwaIJZ_iljs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "14825640113-a78l248tagk2f5q9lm0l97mp53tga9io.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

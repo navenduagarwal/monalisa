@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         NewRelic.withApplicationToken(
-                "AA46abd304288ddabc111087e6488910cc0f1a632b"
+                getString(R.string.NEW_RELIC_API_KEY)
         ).start(this.getApplication());
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
