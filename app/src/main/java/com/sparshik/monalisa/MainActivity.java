@@ -1,6 +1,5 @@
 package com.sparshik.monalisa;
 
-import android.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -8,28 +7,21 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
-import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -166,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             Uri file = Uri.fromFile(new File(imagePath));
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
 
-            InputStream stream = getResources().openRawResource(R.raw.anger);
+            InputStream stream = getResources().openRawResource(R.raw.e1);
             Bitmap secondBitmap = BitmapFactory.decodeStream(stream);
 
             overlayFace(bitmap,secondBitmap);
