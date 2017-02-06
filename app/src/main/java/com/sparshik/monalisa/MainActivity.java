@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         InputStream stream = getResources().openRawResource(R.raw.friends_2);
         file = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getBaseContext().getPackageName() + "/raw/friends_2.png");
         bitmap = BitmapFactory.decodeStream(stream);
+
         overlayFace(bitmap, null);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);

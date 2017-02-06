@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -47,9 +48,9 @@ public class FaceView extends View {
         if ((mBitmap != null) && (mFaces != null)) {
             double scale = drawBitmap(canvas);
 //            if (mSecondBitmap == null) {
-                drawFaceAnnotations(canvas, scale);
+            drawFaceAnnotations(canvas, scale);
 //            } else {
-                drawSecondBitmap(canvas, scale);
+            drawSecondBitmap(canvas, scale);
 //            }
         }
     }
@@ -86,7 +87,7 @@ public class FaceView extends View {
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
-            Log.d("Height", face.getHeight()+"");
+            Log.d("Height", face.getHeight() + "");
 
             for (Landmark landmark : face.getLandmarks()) {
                 int cx = (int) (landmark.getPosition().x * scale);
@@ -98,13 +99,73 @@ public class FaceView extends View {
     }
 
     private void drawSecondBitmap(Canvas canvas, double scale) {
-        if (mFaces.size() > 0 && mSecondBitmap !=null) {
-            Face face = mFaces.valueAt(0);
-            if (face.getLandmarks().size() > 5) {
-                Landmark left_eye = face.getLandmarks().get(6);
-                int cx = (int) (left_eye.getPosition().x * scale);
-                int cy = (int) (left_eye.getPosition().y * scale);
-                canvas.drawBitmap(mSecondBitmap, cx, cy, null);
+        if (mFaces.size() > 0 && mSecondBitmap != null) {
+            for (int i = 0; i < mFaces.size(); ++i) {
+                Face face = mFaces.valueAt(i);
+
+                int height = (int) (face.getHeight() * scale * .75);  //added factor of .75 to adjust image size based on hit and trial
+                int width = (int) (face.getWidth() * scale * .75);
+
+                Log.d("Height", height + "");
+                Log.d("Width", width + "");
+
+                // computing height and width manually
+                int minX = (int) (face.getLandmarks().get(0).getPosition().x * scale);
+                int minY = (int) (face.getLandmarks().get(0).getPosition().y * scale);
+                ;
+                int maxX = (int) (face.getLandmarks().get(0).getPosition().x * scale);
+                ;
+                int maxY = (int) (face.getLandmarks().get(0).getPosition().y * scale);
+                ;
+
+                for (Landmark landmark : face.getLandmarks()) {
+                    int cx = (int) (landmark.getPosition().x * scale);
+                    int cy = (int) (landmark.getPosition().y * scale);
+                    if (cx < minX) {
+                        minX = cx;
+                    }
+                    if (cy < minY) {
+                        minY = cy;
+                    }
+                    if (cy > maxX) {
+                        maxX = cx;
+                    }
+                    if (cy > maxY) {
+                        maxY = cy;
+                    }
+                }
+
+                int cmHeight = maxY - minY;
+                int cmWidth = maxX - minX;
+
+                Log.d("Computed Height", cmHeight + "");
+                Log.d("Computed Width", cmWidth + "");
+
+                float eulerY = face.getEulerY(); //Returns the rotation of the face about the vertical axis of the image.
+                Log.d("eulerY", face.getEulerY() + "");
+                float eulerZ = face.getEulerZ(); // Returns the rotation of the face about the axis pointing out of the image.
+                Landmark left_eye = face.getLandmarks().get(0);
+                Matrix matrix = new Matrix();
+                matrix.postRotate(eulerY);
+
+                Bitmap rotatedBitmap = Bitmap.createBitmap(mSecondBitmap, 0, 0, mSecondBitmap.getWidth(), mSecondBitmap.getHeight(), matrix, true);
+                Bitmap scaledBitmap = Bitmap.createScaledBitmap(rotatedBitmap, width, height, true);
+                int cx = (int) (left_eye.getPosition().x * scale - scaledBitmap.getWidth() / 4);
+                int cy = (int) (left_eye.getPosition().y * scale - scaledBitmap.getHeight() / 4);
+                canvas.drawBitmap(scaledBitmap, cx, cy, null);
+                Log.d("Points", cx + "," + cy);
+
+                /**
+                 * List of landmark points
+                 * RIGHT_EYE of subject picture - 0
+                 * LEFT_EYE of subject picture - 1
+                 * NOSE_BASE - 2
+                 * LEFT_CHEEK of subject picture - 3
+                 * RIGHT_CHEEK of subject picture - 4
+                 * LEFT_MOUTH of subject picture- 5
+                 * RIGHT_MOUTH of subject picture - 6
+                 * BOTTOM_MOUTH - 7
+                 */
             }
         }
     }
