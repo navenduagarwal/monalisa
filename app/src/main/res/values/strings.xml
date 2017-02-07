@@ -5,5 +5,8 @@
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
     <string name="no_faces_error">Unable to find any faces, sorry !</string>
     <string name="action_share">Share</string>
+    <string name="emoji_option">Emoji Options</string>
+    <string name="positive_button">Close</string>
+
 
 </resources>

@@ -47,11 +47,11 @@ public class FaceView extends View {
         super.onDraw(canvas);
         if ((mBitmap != null) && (mFaces != null)) {
             double scale = drawBitmap(canvas);
-//            if (mSecondBitmap == null) {
+            if (mSecondBitmap == null) {
             drawFaceAnnotations(canvas, scale);
-//            } else {
+            } else {
             drawSecondBitmap(canvas, scale);
-//            }
+            }
         }
     }
 

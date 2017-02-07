@@ -1,15 +1,20 @@
 package com.sparshik.monalisa;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -27,19 +32,25 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.firebase.crash.FirebaseCrash;
 import com.newrelic.agent.android.NewRelic;
+import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.patch.SafeFaceDetector;
+import com.sparshik.monalisa.utils.Constants;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
 
     private static final String TAG = "MainActivity";
     private static final int REQUEST_NEW_IMAGE_FILE = 1;
     private int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
     private Uri file;
     private Bitmap bitmap;
+    private SharedPreferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +70,36 @@ public class MainActivity extends AppCompatActivity {
                     MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
         }
 
-        InputStream stream = getResources().openRawResource(R.raw.friends_2);
-        file = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getBaseContext().getPackageName() + "/raw/friends_2.png");
-        bitmap = BitmapFactory.decodeStream(stream);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        overlayFace(bitmap, null);
+        if (bitmap == null) {
+            InputStream stream = getResources().openRawResource(R.raw.friends_2);
+            file = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + getBaseContext().getPackageName() + "/raw/friends_2.png");
+            bitmap = BitmapFactory.decodeStream(stream);
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    FirebaseCrash.report(e);
+                }
+            }
+
+            int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+
+            Drawable d = getResources().getDrawable(current_emoji);
+            Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
+
+            overlayFace(bitmap, secondBitmap);
+
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    FirebaseCrash.report(e);
+                }
+            }
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +110,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton fab_emoji = (FloatingActionButton) findViewById(R.id.fab_emoji);
+        fab_emoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEmojiDialog(view);
+            }
+        });
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     public void overlayFace(Bitmap bitmap, Bitmap secondBitmap) {
@@ -163,8 +213,9 @@ public class MainActivity extends AppCompatActivity {
             file = Uri.fromFile(new File(imagePath));
             bitmap = BitmapFactory.decodeFile(imagePath);
 
-            InputStream stream = getResources().openRawResource(R.raw.e1);
-            Bitmap secondBitmap = BitmapFactory.decodeStream(stream);
+            int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+            Drawable d = getResources().getDrawable(current_emoji);
+            Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
 
             overlayFace(bitmap, secondBitmap);
 
@@ -207,4 +258,18 @@ public class MainActivity extends AppCompatActivity {
 //        return intent;
 //    }
 
+    public void showEmojiDialog(View view) {
+        DialogFragment dialogFragment = new EmojiDialogFragment();
+        dialogFragment.show(MainActivity.this.getFragmentManager(), "EmojiDialogFragment");
+    }
+
+    @Override
+    public void onClose() {
+
+        int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+        Drawable d = getResources().getDrawable(current_emoji);
+        Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
+        overlayFace(bitmap, secondBitmap);
+
+    }
 }
