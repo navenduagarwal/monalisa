@@ -55,7 +55,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private float mFaceHappiness;
     private Bitmap bitmapEmoji;
 
-    FaceGraphic(GraphicOverlay overlay, Bitmap bitmap) {
+    FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
@@ -63,7 +63,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
         mFacePositionPaint = new Paint();
         mFacePositionPaint.setColor(selectedColor);
-        bitmapEmoji = bitmap;
 
         mIdPaint = new Paint();
         mIdPaint.setColor(selectedColor);
@@ -84,7 +83,8 @@ class FaceGraphic extends GraphicOverlay.Graphic {
      * Updates the face instance from the detection of the most recent frame.  Invalidates the
      * relevant portions of the overlay to trigger a redraw.
      */
-    void updateFace(Face face) {
+    void updateFace(Face face, Bitmap bitmap) {
+        bitmapEmoji = bitmap;
         mFace = face;
         postInvalidate();
     }

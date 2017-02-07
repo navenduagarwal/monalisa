@@ -341,10 +341,7 @@ public final class FaceTrackerActivity extends AppCompatActivity implements Emoj
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
-            int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
-            Drawable d = getResources().getDrawable(current_emoji);
-            Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
-            mFaceGraphic = new FaceGraphic(overlay, secondBitmap);
+            mFaceGraphic = new FaceGraphic(overlay);
         }
 
         /**
@@ -361,7 +358,10 @@ public final class FaceTrackerActivity extends AppCompatActivity implements Emoj
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
-            mFaceGraphic.updateFace(face);
+            int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+            Drawable d = getResources().getDrawable(current_emoji);
+            Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
+            mFaceGraphic.updateFace(face, secondBitmap);
         }
 
         /**
