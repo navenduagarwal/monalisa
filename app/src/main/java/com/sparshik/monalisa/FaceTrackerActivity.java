@@ -19,11 +19,18 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -40,8 +47,10 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.ui.camera.CameraSourcePreview;
 import com.sparshik.monalisa.ui.camera.GraphicOverlay;
+import com.sparshik.monalisa.utils.Constants;
 
 import java.io.IOException;
 
@@ -49,7 +58,7 @@ import java.io.IOException;
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
  * overlay graphics to indicate the position, size, and ID of each face.
  */
-public final class FaceTrackerActivity extends AppCompatActivity {
+public final class FaceTrackerActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
     private static final String TAG = "FaceTracker";
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -57,6 +66,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+    private SharedPreferences preferences;
 
     //==============================================================================================
     // Activity Methods
@@ -74,6 +84,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -83,6 +95,14 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         } else {
             requestCameraPermission();
         }
+
+        FloatingActionButton fab_emoji = (FloatingActionButton) findViewById(R.id.fab_emoji);
+        fab_emoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showEmojiDialog(view);
+            }
+        });
     }
 
     /**
@@ -136,7 +156,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_photo) {
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, PhotoActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -290,6 +310,16 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     // Graphic Face Tracker
     //==============================================================================================
 
+    public void showEmojiDialog(View view) {
+        DialogFragment dialogFragment = new EmojiDialogFragment();
+        dialogFragment.show(FaceTrackerActivity.this.getFragmentManager(), "EmojiDialogFragment");
+    }
+
+    @Override
+    public void onClose() {
+
+    }
+
     /**
      * Factory for creating a face tracker to be associated with a new face.  The multiprocessor
      * uses this factory to create face trackers as needed -- one for each individual.
@@ -311,7 +341,10 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
-            mFaceGraphic = new FaceGraphic(overlay);
+            int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+            Drawable d = getResources().getDrawable(current_emoji);
+            Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
+            mFaceGraphic = new FaceGraphic(overlay, secondBitmap);
         }
 
         /**

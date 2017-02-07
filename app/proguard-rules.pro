@@ -21,3 +21,4 @@
 -keep class com.newrelic.** { *; }
 -dontwarn com.newrelic.**
 -keepattributes Exceptions, Signature, InnerClasses, LineNumberTable
+-keep class io.codetail.animation.arcanimator.** { *; }

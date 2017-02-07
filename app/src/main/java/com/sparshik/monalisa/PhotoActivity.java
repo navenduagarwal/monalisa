@@ -1,5 +1,6 @@
 package com.sparshik.monalisa;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.ContentResolver;
@@ -13,6 +14,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -37,17 +39,18 @@ import com.newrelic.agent.android.NewRelic;
 import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.patch.SafeFaceDetector;
 import com.sparshik.monalisa.utils.Constants;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class MainActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
+public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "PhotoActivity";
     private static final int REQUEST_NEW_IMAGE_FILE = 1;
     private int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
-    private Uri file;
+    private Uri file, mCropImageUri;
     private Bitmap bitmap;
     private SharedPreferences preferences;
 
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_photo);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -101,12 +104,14 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
             }
         }
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intentImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intentImage, REQUEST_NEW_IMAGE_FILE);
+//                onSelectImageClick(view);
             }
         });
 
@@ -191,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
 
 
     @Override
+    @SuppressLint("NewApi")
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_NEW_IMAGE_FILE && resultCode == Activity.RESULT_OK && data != null) {
@@ -219,6 +225,37 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
 
             overlayFace(bitmap, secondBitmap);
 
+        }
+
+        if (requestCode == CropImage.PICK_IMAGE_CHOOSER_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Uri imageUri = CropImage.getPickImageResultUri(this, data);
+
+            // For API >= 23 we need to check specifically that we have permissions to read external storage.
+            if (CropImage.isReadExternalStoragePermissionsRequired(this, imageUri)) {
+                // request permissions and handle the result in onRequestPermissionsResult()
+                mCropImageUri = imageUri;
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE);
+            } else {
+                // no permissions required or already grunted, can start crop image activity
+                startCropImageActivity(imageUri);
+            }
+        }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                Uri resultUri = result.getUri();
+
+                if (bitmap != null) {
+                    int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
+                    Drawable d = getResources().getDrawable(current_emoji);
+                    Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
+
+                    overlayFace(bitmap, secondBitmap);
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
         }
     }
 
@@ -260,7 +297,7 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
 
     public void showEmojiDialog(View view) {
         DialogFragment dialogFragment = new EmojiDialogFragment();
-        dialogFragment.show(MainActivity.this.getFragmentManager(), "EmojiDialogFragment");
+        dialogFragment.show(PhotoActivity.this.getFragmentManager(), "EmojiDialogFragment");
     }
 
     @Override
@@ -271,5 +308,41 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
         Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
         overlayFace(bitmap, secondBitmap);
 
+    }
+
+    public void onSelectImageClick(View view) {
+        if (Build.VERSION.SDK_INT > 23) {
+            if (CropImage.isExplicitCameraPermissionRequired(this)) {
+                requestPermissions(new String[]{android.Manifest.permission.CAMERA}, CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE);
+            } else {
+                CropImage.startPickImageActivity(this);
+            }
+        } else {
+            CropImage.startPickImageActivity(this);
+        }
+    }
+
+
+    private void startCropImageActivity(Uri imageUri) {
+        CropImage.activity(imageUri)
+                .start(this);
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        if (requestCode == CropImage.CAMERA_CAPTURE_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                CropImage.startPickImageActivity(this);
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+            }
+        }
+        if (requestCode == CropImage.PICK_IMAGE_PERMISSIONS_REQUEST_CODE) {
+            if (mCropImageUri != null && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // required permissions granted, start crop image activity
+                startCropImageActivity(mCropImageUri);
+            } else {
+                Toast.makeText(this, "Cancelling, required permissions are not granted", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

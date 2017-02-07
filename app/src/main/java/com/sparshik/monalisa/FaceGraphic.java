@@ -15,6 +15,7 @@
  */
 package com.sparshik.monalisa;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -32,6 +33,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private static final float ID_Y_OFFSET = 50.0f;
     private static final float ID_X_OFFSET = -50.0f;
     private static final float BOX_STROKE_WIDTH = 5.0f;
+
 
     private static final int COLOR_CHOICES[] = {
             Color.BLUE,
@@ -51,8 +53,9 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private volatile Face mFace;
     private int mFaceId;
     private float mFaceHappiness;
+    private Bitmap bitmapEmoji;
 
-    FaceGraphic(GraphicOverlay overlay) {
+    FaceGraphic(GraphicOverlay overlay, Bitmap bitmap) {
         super(overlay);
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
@@ -60,6 +63,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
 
         mFacePositionPaint = new Paint();
         mFacePositionPaint.setColor(selectedColor);
+        bitmapEmoji = bitmap;
 
         mIdPaint = new Paint();
         mIdPaint.setColor(selectedColor);
@@ -103,6 +107,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
         canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
         canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET * 2, y - ID_Y_OFFSET * 2, mIdPaint);
+        canvas.drawBitmap(bitmapEmoji, x, y, null);
 
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);

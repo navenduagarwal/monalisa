@@ -30,7 +30,7 @@
             android:value="face" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".PhotoActivity"
             android:label="@string/title_main_activity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -47,6 +47,10 @@
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
+
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
 
     </application>
 
