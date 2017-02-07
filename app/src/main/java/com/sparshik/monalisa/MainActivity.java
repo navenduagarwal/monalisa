@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_photo, menu);
         return true;
     }
 
@@ -240,8 +240,8 @@ public class MainActivity extends AppCompatActivity implements EmojiDialogFragme
         if (id == R.id.action_settings) {
             return true;
         }
-        if (id == R.id.action_share) {
-//            startActivity(createShareMonalisaIntent(file,null));
+        if (id == R.id.action_live) {
+            startActivity(new Intent(this, FaceTrackerActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
