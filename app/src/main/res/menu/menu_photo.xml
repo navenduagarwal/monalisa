@@ -4,13 +4,8 @@
     tools:context="com.sparshik.monalisa.PhotoActivity">
     <item
         android:id="@+id/action_live"
-        android:icon="@android:drawable/presence_video_online"
+        android:icon="@drawable/ic_videocam_white_24dp"
         android:orderInCategory="100"
         android:title="@string/action_live"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
 </menu>

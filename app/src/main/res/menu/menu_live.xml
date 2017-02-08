@@ -4,13 +4,8 @@
     tools:context="com.sparshik.monalisa.PhotoActivity">
     <item
         android:id="@+id/action_photo"
-        android:icon="@android:drawable/ic_menu_camera"
+        android:icon="@drawable/ic_photo_white_24dp"
         android:orderInCategory="100"
         android:title="@string/action_photo"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
 </menu>

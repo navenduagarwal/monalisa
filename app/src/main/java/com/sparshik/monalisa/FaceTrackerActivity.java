@@ -33,7 +33,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -47,6 +46,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.sparshik.monalisa.base.BaseActivity;
 import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.ui.camera.CameraSourcePreview;
 import com.sparshik.monalisa.ui.camera.GraphicOverlay;
@@ -58,7 +58,7 @@ import java.io.IOException;
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
  * overlay graphics to indicate the position, size, and ID of each face.
  */
-public final class FaceTrackerActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
+public final class FaceTrackerActivity extends BaseActivity implements EmojiDialogFragment.Callback {
     private static final String TAG = "FaceTracker";
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -141,7 +141,7 @@ public final class FaceTrackerActivity extends AppCompatActivity implements Emoj
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_live, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -151,10 +151,6 @@ public final class FaceTrackerActivity extends AppCompatActivity implements Emoj
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if (id == R.id.action_photo) {
             startActivity(new Intent(this, PhotoActivity.class));
             return true;

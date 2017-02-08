@@ -21,7 +21,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.SparseArray;
@@ -35,7 +34,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.firebase.crash.FirebaseCrash;
-import com.newrelic.agent.android.NewRelic;
+import com.sparshik.monalisa.base.BaseActivity;
 import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.patch.SafeFaceDetector;
 import com.sparshik.monalisa.utils.Constants;
@@ -45,7 +44,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragment.Callback {
+public class PhotoActivity extends BaseActivity implements EmojiDialogFragment.Callback {
 
     private static final String TAG = "PhotoActivity";
     private static final int REQUEST_NEW_IMAGE_FILE = 1;
@@ -61,10 +60,6 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
         setContentView(R.layout.activity_photo);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        NewRelic.withApplicationToken(
-                getString(R.string.NEW_RELIC_API_KEY)
-        ).start(this.getApplication());
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -266,7 +261,7 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_photo, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -276,10 +271,6 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if (id == R.id.action_live) {
             startActivity(new Intent(this, FaceTrackerActivity.class));
             return true;
