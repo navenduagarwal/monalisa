@@ -161,7 +161,7 @@ public class PhotoActivity extends BaseActivity implements EmojiDialogFragment.C
             // isOperational() can be used to check if the required native library is currently
             // available.  The detector will automatically become operational once the library
             // download completes on device.
-            Log.w(TAG, "Face detector dependencies are not yet available.");
+//            Log.w(TAG, "Face detector dependencies are not yet available.");
 
             // Check for low storage.  If there is low storage, the native library will not be
             // downloaded, so detection will not become operational.
@@ -209,7 +209,7 @@ public class PhotoActivity extends BaseActivity implements EmojiDialogFragment.C
             //GET PATHS
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String imagePath = cursor.getString(columnIndex);
-            Log.d(getClass().getSimpleName(), " Image File PATH IN PHONE: " + imagePath);
+//            Log.d(getClass().getSimpleName(), " Image File PATH IN PHONE: " + imagePath);
             cursor.close();
             file = Uri.fromFile(new File(imagePath));
             bitmap = BitmapFactory.decodeFile(imagePath);
@@ -270,7 +270,6 @@ public class PhotoActivity extends BaseActivity implements EmojiDialogFragment.C
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if (id == R.id.action_live) {
             startActivity(new Intent(this, FaceTrackerActivity.class));
             return true;
@@ -278,16 +277,6 @@ public class PhotoActivity extends BaseActivity implements EmojiDialogFragment.C
         return super.onOptionsItemSelected(item);
     }
 
-//    private Intent createShareMonalisaIntent() {
-
-//        Intent intent = new Intent(Intent.ACTION_SEND);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-//        intent.putExtra(Intent.EXTRA_STREAM, uri);
-//        intent.putExtra(Intent.EXTRA_TEXT,  + " " + Constants.SHARE_HASHTAG);
-//        intent.setType("image/*");
-//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//        return intent;
-//    }
 
     public void showEmojiDialog(View view) {
         DialogFragment dialogFragment = new EmojiDialogFragment();

@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -87,13 +86,13 @@ public class FaceView extends View {
 
         for (int i = 0; i < mFaces.size(); ++i) {
             Face face = mFaces.valueAt(i);
-            Log.d("Height", face.getHeight() + "");
+//            Log.d("Height", face.getHeight() + "");
 
             for (Landmark landmark : face.getLandmarks()) {
                 int cx = (int) (landmark.getPosition().x * scale);
                 int cy = (int) (landmark.getPosition().y * scale);
                 canvas.drawCircle(cx, cy, 10, paint);
-                Log.d("Points", cx + "," + cy);
+//                Log.d("Points", cx + "," + cy);
             }
         }
     }
@@ -106,8 +105,8 @@ public class FaceView extends View {
                 int height = (int) (face.getHeight() * scale * .75);  //added factor of .75 to adjust image size based on hit and trial
                 int width = (int) (face.getWidth() * scale * .75);
 
-                Log.d("Height", height + "");
-                Log.d("Width", width + "");
+//                Log.d("Height", height + "");
+//                Log.d("Width", width + "");
 
                 // computing height and width manually
                 int minX = (int) (face.getLandmarks().get(0).getPosition().x * scale);
@@ -138,11 +137,11 @@ public class FaceView extends View {
                 int cmHeight = maxY - minY;
                 int cmWidth = maxX - minX;
 
-                Log.d("Computed Height", cmHeight + "");
-                Log.d("Computed Width", cmWidth + "");
+//                Log.d("Computed Height", cmHeight + "");
+//                Log.d("Computed Width", cmWidth + "");
 
                 float eulerY = face.getEulerY(); //Returns the rotation of the face about the vertical axis of the image.
-                Log.d("eulerY", face.getEulerY() + "");
+//                Log.d("eulerY", face.getEulerY() + "");
                 float eulerZ = face.getEulerZ(); // Returns the rotation of the face about the axis pointing out of the image.
                 Landmark left_eye = face.getLandmarks().get(0);
                 Matrix matrix = new Matrix();
@@ -153,7 +152,7 @@ public class FaceView extends View {
                 int cx = (int) (left_eye.getPosition().x * scale - scaledBitmap.getWidth() / 4);
                 int cy = (int) (left_eye.getPosition().y * scale - scaledBitmap.getHeight() / 4);
                 canvas.drawBitmap(scaledBitmap, cx, cy, null);
-                Log.d("Points", cx + "," + cy);
+//                Log.d("Points", cx + "," + cy);
 
                 /**
                  * List of landmark points

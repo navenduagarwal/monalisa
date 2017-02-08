@@ -46,6 +46,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.firebase.crash.FirebaseCrash;
 import com.sparshik.monalisa.base.BaseActivity;
 import com.sparshik.monalisa.emojis.EmojiDialogFragment;
 import com.sparshik.monalisa.ui.camera.CameraSourcePreview;
@@ -243,19 +244,19 @@ public final class FaceTrackerActivity extends BaseActivity implements EmojiDial
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
-            Log.d(TAG, "Got unexpected permission result: " + requestCode);
+//            Log.d(TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
         }
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Camera permission granted - initialize the camera source");
+//            Log.d(TAG, "Camera permission granted - initialize the camera source");
             // we have permission, so create the camerasource
             createCameraSource();
             return;
         }
 
-        Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
+        FirebaseCrash.log(TAG + "Permission not granted: results len = " + grantResults.length +
                 " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
@@ -295,7 +296,8 @@ public final class FaceTrackerActivity extends BaseActivity implements EmojiDial
             try {
                 mPreview.start(mCameraSource, mGraphicOverlay);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to start camera source.", e);
+//                Log.e(TAG, "Unable to start camera source.", e);
+                FirebaseCrash.report(e);
                 mCameraSource.release();
                 mCameraSource = null;
             }
