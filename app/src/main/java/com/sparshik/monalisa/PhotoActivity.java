@@ -109,9 +109,9 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intentImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intentImage, REQUEST_NEW_IMAGE_FILE);
-//                onSelectImageClick(view);
+//                Intent intentImage = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(intentImage, REQUEST_NEW_IMAGE_FILE);
+                onSelectImageClick(view);
             }
         });
 
@@ -245,16 +245,19 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Uri resultUri = result.getUri();
-
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(PhotoActivity.this.getContentResolver(), resultUri);
+                } catch (IOException e) {
+                    FirebaseCrash.report(e);
+                }
                 if (bitmap != null) {
                     int current_emoji = preferences.getInt(Constants.KEY_CURRENT_EMOJI, Constants.DEFAULT_EMOJI);
                     Drawable d = getResources().getDrawable(current_emoji);
                     Bitmap secondBitmap = ((BitmapDrawable) (d)).getBitmap();
-
                     overlayFace(bitmap, secondBitmap);
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
+                FirebaseCrash.report(result.getError());
             }
         }
     }
@@ -322,7 +325,6 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
         }
     }
 
-
     private void startCropImageActivity(Uri imageUri) {
         CropImage.activity(imageUri)
                 .start(this);
@@ -345,4 +347,5 @@ public class PhotoActivity extends AppCompatActivity implements EmojiDialogFragm
             }
         }
     }
+
 }
